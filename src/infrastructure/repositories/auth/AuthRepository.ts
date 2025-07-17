@@ -16,8 +16,6 @@ export class AuthRepository implements IAuthRepository {
 			throw new Error("로그인이 실패하였습니다.");
 		}
 
-		console.log("response", response);
-
 		return {
 			accessToken: response.data.accessToken,
 			refreshToken: response.data.refreshToken,

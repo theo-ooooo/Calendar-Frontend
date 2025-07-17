@@ -3,12 +3,12 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
 	request: NextRequest,
-	{ params }: { params: { provider: string } },
+	{ params }: { params: Promise<{ provider: string }> },
 ) {
 	try {
 		const { searchParams } = new URL(request.url);
 		const code = searchParams.get("code");
-		const provider = params.provider;
+		const { provider } = await params;
 
 		// 코드 검증
 		if (!code) {
@@ -31,16 +31,16 @@ export async function GET(
 			return Redirect(request, "백엔드 호출 실패");
 		}
 
-		const data = await response.json();
+		const { data, status, message } = await response.json();
 
-		if (data.status !== "success") {
-			console.log(data.message);
+		if (status !== "success") {
+			console.log(message);
 			return Redirect(request, "/auth/login", "로그인 실패");
 		}
 
 		const cookieStore = await cookies();
 
-		cookieStore.set("accessToken", data.data.access_token, {
+		cookieStore.set("accessToken", data.accessToken, {
 			httpOnly: true,
 			secure: process.env.NODE_ENV === "production",
 			sameSite: "lax",
@@ -49,7 +49,7 @@ export async function GET(
 		});
 
 		// Refresh Token 저장 (긴 유효기간)
-		cookieStore.set("refreshToken", data.data.refresh_token, {
+		cookieStore.set("refreshToken", data.refreshToken, {
 			httpOnly: true,
 			secure: process.env.NODE_ENV === "production",
 			sameSite: "lax",

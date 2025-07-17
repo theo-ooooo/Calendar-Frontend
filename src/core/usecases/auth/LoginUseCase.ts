@@ -9,7 +9,7 @@ export class LoginUseCase {
 			throw new Error("유효하지 않은 인증정보 입니다.");
 		}
 		const result = await this.authRepository.login({
-			code: authDomain.getCode(),
+			code: authDomain.getCode() as string,
 			provider: authDomain.getProvider(),
 		});
 

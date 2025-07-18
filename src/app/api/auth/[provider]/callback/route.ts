@@ -10,6 +10,8 @@ export async function GET(
 		const code = searchParams.get("code");
 		const { provider } = await params;
 
+		console.log(111, provider, code);
+
 		// 코드 검증
 		if (!code) {
 			console.error("인증 코드가 없습니다");
@@ -43,7 +45,6 @@ export async function GET(
 		cookieStore.set("accessToken", data.accessToken, {
 			httpOnly: true,
 			secure: process.env.NODE_ENV === "production",
-			sameSite: "lax",
 			maxAge: 60 * 60 * 24, // 1일
 			path: "/",
 		});
@@ -52,13 +53,13 @@ export async function GET(
 		cookieStore.set("refreshToken", data.refreshToken, {
 			httpOnly: true,
 			secure: process.env.NODE_ENV === "production",
-			sameSite: "lax",
 			maxAge: 60 * 60 * 24 * 7, // 7일
 			path: "/",
 		});
 
 		return Redirect(request, "/");
 	} catch (error) {
+		console.log(error);
 		Redirect(request, "/auth/login", error?.toString());
 	}
 }

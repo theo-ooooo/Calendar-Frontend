@@ -1,7 +1,7 @@
 // presentation/viewmodels/AuthCallbackViewModel.ts
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { LoginUseCase } from "@/core/usecases/auth/LoginUseCase";
+import { LoginUsecase } from "@/core/usecases/auth/LoginUsecase";
 import { ApiClient } from "@/infrastructure/api/ApiClient";
 import { AuthRepository } from "@/infrastructure/repositories/auth/AuthRepository";
 import { AuthDomain } from "@/core/domain/auth/AuthDomain";
@@ -11,10 +11,10 @@ export function useAuthCallbackViewModel() {
 	const [error, setError] = useState<string | null>(null);
 	const router = useRouter();
 
-	const [loginUseCase] = useState(() => {
+	const [loginUsecase] = useState(() => {
 		const apiClient = new ApiClient();
 		const authRepository = new AuthRepository(apiClient);
-		return new LoginUseCase(authRepository);
+		return new LoginUsecase(authRepository);
 	});
 
 	const handleCallback = async (provider: string, code: string) => {
@@ -23,7 +23,7 @@ export function useAuthCallbackViewModel() {
 
 		try {
 			const authDomain = new AuthDomain(provider, code);
-			const result = await loginUseCase.execute(authDomain);
+			const result = await loginUsecase.execute(authDomain);
 
 			// 토큰 저장
 			if (typeof window !== "undefined") {

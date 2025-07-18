@@ -6,9 +6,11 @@ export async function middleware(request: NextRequest) {
 
 	const isLoginPage = !!request.nextUrl.pathname.startsWith("/auth");
 
+	const response = NextResponse.next();
+
 	// 이미 로그인 페이지에 있고 토큰이 없다면 그대로 진행
 	if (isLoginPage && !refreshToken) {
-		return NextResponse.next();
+		return response;
 	}
 
 	// 로그인 페이지가 아닌데 리프레쉬 토큰이 없다면, 로그인 페이지로
@@ -28,12 +30,9 @@ export async function middleware(request: NextRequest) {
 			},
 		);
 
-		console.log(refreshResponse.ok, refreshToken);
-
 		if (refreshResponse.ok) {
 			const { data, status } = await refreshResponse.json();
 
-			const response = NextResponse.next();
 			if (status === "success") {
 				accessToken = data.accessToken;
 				refreshToken = data.refreshToken;
@@ -52,8 +51,6 @@ export async function middleware(request: NextRequest) {
 					maxAge: 60 * 60 * 24 * 7, // 7일
 					path: "/",
 				});
-
-				response.headers.set("Authorization", `Bearer ${accessToken}`);
 			} else {
 				response.cookies.delete("refreshToken");
 			}
@@ -68,7 +65,7 @@ export async function middleware(request: NextRequest) {
 		return NextResponse.redirect(new URL("/", request.url));
 	}
 
-	return NextResponse.next();
+	return response;
 }
 
 export const config = {

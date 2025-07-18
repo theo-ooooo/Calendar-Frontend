@@ -1,7 +1,8 @@
 import type { AuthDomain } from "@/core/domain/auth/AuthDomain";
 import type { IAuthRepository } from "@/infrastructure/repositories/auth/IAuthRepository";
+import type { LoginResult } from "@/infrastructure/types/Auth";
 
-export class LoginUseCase {
+export class LoginUsecase {
 	constructor(private authRepository: IAuthRepository) {}
 
 	async execute(authDomain: AuthDomain): Promise<LoginResult> {
@@ -15,9 +16,4 @@ export class LoginUseCase {
 
 		return result;
 	}
-}
-
-export interface LoginResult {
-	accessToken: string;
-	refreshToken: string;
 }

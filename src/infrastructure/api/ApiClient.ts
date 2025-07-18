@@ -1,5 +1,3 @@
-import { cookies } from "next/headers";
-
 export class ApiClient {
 	private baseURL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -11,6 +9,7 @@ export class ApiClient {
 		const response = await fetch(`${this.baseURL}${endpoint}`, {
 			method,
 			headers: this.getHeaders(),
+			credentials: "include",
 			body: data ? JSON.stringify(data) : undefined,
 		});
 
@@ -44,15 +43,6 @@ export class ApiClient {
 			"Content-Type": "application/json",
 		};
 
-		const token = this.getToken();
-		if (token) {
-			headers.Authorization = `Bearer ${token}`;
-		}
-
 		return headers;
-	}
-
-	private async getToken(): Promise<string | null> {
-		return (await cookies()).get("accessToken")?.value || null;
 	}
 }

@@ -1,6 +1,6 @@
-import type { LoginResult } from "@/core/usecases/auth/LoginUseCase";
-import type { IAuthRepository, LoginRequest } from "./IAuthRepository";
+import type { IAuthRepository } from "./IAuthRepository";
 import type { ApiClient } from "@/infrastructure/api/ApiClient";
+import type { LoginRequest, LoginResult } from "@/infrastructure/types/Auth";
 import type { GlobalResponse } from "@/shared/types/response";
 
 export class AuthRepository implements IAuthRepository {

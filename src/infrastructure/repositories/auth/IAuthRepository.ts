@@ -1,4 +1,4 @@
-import type { LoginResult } from "@/core/usecases/auth/LoginUseCase";
+import type { LoginResult } from "@/infrastructure/types/Auth";
 
 export interface LoginRequest {
 	code: string;

@@ -1,22 +1,15 @@
+import { cookies } from "next/headers";
+
 export class ApiClient {
 	private baseURL = process.env.NEXT_PUBLIC_API_URL;
 
-	async get(endpoint: string) {
+	async request<T = any, K = any>(
+		endpoint: string,
+		method: "GET" | "POST" | "PUT" | "DELETE" = "GET",
+		data?: T,
+	): Promise<K> {
 		const response = await fetch(`${this.baseURL}${endpoint}`, {
-			method: "GET",
-			headers: this.getHeaders(),
-		});
-
-		if (!response.ok) {
-			throw new Error(`API Error: ${response.status}`);
-		}
-
-		return response.json();
-	}
-
-	async post<T, K>(endpoint: string, data?: T): Promise<K> {
-		const response = await fetch(`${this.baseURL}${endpoint}`, {
-			method: "POST",
+			method,
 			headers: this.getHeaders(),
 			body: data ? JSON.stringify(data) : undefined,
 		});
@@ -29,31 +22,21 @@ export class ApiClient {
 		return response.json() as Promise<K>;
 	}
 
-	async put<T, K>(endpoint: string, data?: T): Promise<K> {
-		const response = await fetch(`${this.baseURL}${endpoint}`, {
-			method: "PUT",
-			headers: this.getHeaders(),
-			body: data ? JSON.stringify(data) : undefined,
-		});
-
-		if (!response.ok) {
-			throw new Error(`API Error: ${response.status}`);
-		}
-
-		return response.json() as Promise<K>;
+	// 편의 메서드들
+	get<K = any>(endpoint: string): Promise<K> {
+		return this.request<void, K>(endpoint, "GET");
 	}
 
-	async delete<K>(endpoint: string): Promise<K> {
-		const response = await fetch(`${this.baseURL}${endpoint}`, {
-			method: "DELETE",
-			headers: this.getHeaders(),
-		});
+	post<T = any, K = any>(endpoint: string, data?: T): Promise<K> {
+		return this.request<T, K>(endpoint, "POST", data);
+	}
 
-		if (!response.ok) {
-			throw new Error(`API Error: ${response.status}`);
-		}
+	put<T = any, K = any>(endpoint: string, data?: T): Promise<K> {
+		return this.request<T, K>(endpoint, "PUT", data);
+	}
 
-		return response.json();
+	delete<K = any>(endpoint: string): Promise<K> {
+		return this.request<void, K>(endpoint, "DELETE");
 	}
 
 	private getHeaders(): HeadersInit {
@@ -63,16 +46,13 @@ export class ApiClient {
 
 		const token = this.getToken();
 		if (token) {
-			headers["Authorization"] = `Bearer ${token}`;
+			headers.Authorization = `Bearer ${token}`;
 		}
 
 		return headers;
 	}
 
-	private getToken(): string | null {
-		if (typeof window !== "undefined") {
-			return localStorage.getItem("accessToken");
-		}
-		return null;
+	private async getToken(): Promise<string | null> {
+		return (await cookies()).get("accessToken")?.value || null;
 	}
 }
